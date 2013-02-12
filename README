@@ -1,0 +1,1 @@
+This is based on the Ch.13 exercises from Think Python, adapted to Ruby.
