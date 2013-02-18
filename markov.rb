@@ -2,20 +2,26 @@ class Writer
 
 	def initialize(file)
 		@file = file
+		@suffixes = {}
 	end
 
-	def words	
-		File.read(@file).split(/\s+/)		
+	def words
+		@words ||= File.read(@file).gsub(/\n\n/," *P* ").split
 	end
 
 
 	def suffixes(n)		# hash: prefix of length n => array of suffixes with repetition
+		if @suffixes[n]
+			return @suffixes[n]
+		end
+		
 		hash = Hash.new { |hash,key| hash[key] = [] }
-		puts Time.now
+#		current_time = Time.now
 		for i in (0..(words.length - n))
 			hash[words[i...(i+n)]] << words[i+n]
 		end
-		puts Time.now
+#		puts Time.now - current_time
+		@suffixes[n] = hash
 		hash
 	end
 	
@@ -36,19 +42,26 @@ class Writer
  			prefix = array[(0-order)..-1]
  			array << chain(prefix,order)
  		end
-		array
+ 		paragraph = ""
+ 		array.each do |x|
+ 			paragraph += x + " "
+ 		end
+	
+		paragraph
 	end
 
 
 	def print_test
-		suffixes(1)
+		puts words
+		#suffixes(1)
 		#puts chain(["Happy", "families"], 2)
-		#puts paragraph(["Happy", "families"], 2, 3)
+		#puts "*****"
+		#puts paragraph(["Three"], 2, 100)
 	end
 
 end
 
 
 
-Writer.new('anna_k_p1c1.txt').print_test
-#Writer.new('test_text.txt').print_test
+#Writer.new('anna_k_p1c1.txt').print_test
+Writer.new('test_text.txt').print_test
