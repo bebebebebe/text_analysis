@@ -52,16 +52,16 @@ class Writer
 
 
 	def print_test
-		puts words
+		#puts words
 		#suffixes(1)
 		#puts chain(["Happy", "families"], 2)
-		#puts "*****"
-		#puts paragraph(["Three"], 2, 100)
+		puts "*****"
+		puts paragraph(["the", "pillow"], 2, 50)
 	end
 
 end
 
 
 
-#Writer.new('anna_k_p1c1.txt').print_test
-Writer.new('test_text.txt').print_test
+Writer.new('anna_k_p1c1.txt').print_test
+#Writer.new('test_text.txt').print_test
