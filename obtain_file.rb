@@ -1,6 +1,8 @@
 require "open-uri"
 
-url = "http://www.gutenberg.org/files/40196/40196-0.txt"
+url_start = "http://www.gutenberg.org/files"
+url_rest = "1656/1656.txt"
+url = url_start + "/" + url_rest
 
 remote_data = open(url).read
 #my_local_file = open("my-downloaded-page.html", "w") 

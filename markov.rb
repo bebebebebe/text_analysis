@@ -1,8 +1,12 @@
+require './process_header'
+
 class Writer
+	
 
 	def initialize(file)
-		@file = file
+		@file = remove_header(file)
 		@suffixes = {}
+		
 	end
 
 	def words
@@ -13,14 +17,12 @@ class Writer
 	def suffixes(n)		# hash: prefix of length n => array of suffixes with repetition
 		if @suffixes[n]
 			return @suffixes[n]
-		end
-		
+		end		
 		hash = Hash.new { |hash,key| hash[key] = [] }
-#		current_time = Time.now
+
 		for i in (0..(words.length - n))
 			hash[words[i...(i+n)]] << words[i+n]
 		end
-#		puts Time.now - current_time
 		@suffixes[n] = hash
 		hash
 	end
@@ -32,36 +34,58 @@ class Writer
 		successors[rand(successors.length)]
 	end
 
-# assume start.length >= order
-	def paragraph(start, order, length)
+
+# 
+	def start(n)
+		$/ = "\n\n"
+		paragraph_array = File.readlines(@file)		
+		paragraph = paragraph_array[rand(paragraph_array.length)]
+		start = paragraph.split[0...n]
+	end
+
+
+	def paragraph(order)
 		array = []
+		start = start(order)		
+		while start.length < order		# check that start is long enough
+			start = start(order)
+		end
 		for i in (0...order)
 			array[i] = start[i]
 		end
- 		while array.length < length	
+		array
+		while array.length < 500
  			prefix = array[(0-order)..-1]
- 			array << chain(prefix,order)
- 		end
+ 			next_word = chain(prefix, order)
+ 			if next_word == "*P*"
+ 				break
+ 			else array << next_word
+ 			end
+ 		end 
  		paragraph = ""
  		array.each do |x|
  			paragraph += x + " "
  		end
-	
 		paragraph
 	end
-
-
-	def print_test
-		#puts words
-		#suffixes(1)
-		#puts chain(["Happy", "families"], 2)
-		puts "*****"
-		puts paragraph(["the", "pillow"], 2, 50)
+	
+	def output(order=2, n=2)
+		n.times { puts; puts paragraph(order); puts }
+		give_source_info
+	end
+	
+	def give_source_info
+		if source_info
+			puts
+			30.times {print " "}
+			puts "(based on #{source_info[1]} by #{source_info[0]})"
+		end
 	end
 
 end
 
+#Writer.new('anna_k.txt').give_source_info
+Writer.new('anna_k.txt').output(2,3)
+#Writer.new('test_text.txt').output
 
 
-Writer.new('anna_k_p1c1.txt').print_test
-#Writer.new('test_text.txt').print_test
