@@ -1,12 +1,15 @@
 require './process_header'
 
 class Writer
-	
 
-	def initialize(file)
-		@file = remove_header(file)
-		@suffixes = {}
+	def initialize
+	
+		if ARGV.first
+			@file = ARGV.first
+			else @file = "anna_k.txt"
+		end
 		
+		@suffixes = {}		
 	end
 
 	def words
@@ -35,7 +38,6 @@ class Writer
 	end
 
 
-# 
 	def start(n)
 		$/ = "\n\n"
 		paragraph_array = File.readlines(@file)		
@@ -70,6 +72,7 @@ class Writer
 	end
 	
 	def output(order=2, n=2)
+		remove_header(@file)
 		n.times { puts; puts paragraph(order); puts }
 		give_source_info
 	end
@@ -81,11 +84,10 @@ class Writer
 			puts "(based on #{source_info[1]} by #{source_info[0]})"
 		end
 	end
-
 end
 
-#Writer.new('anna_k.txt').give_source_info
-Writer.new('anna_k.txt').output(2,3)
-#Writer.new('test_text.txt').output
+
+
+Writer.new.output(2,3)
 
 
