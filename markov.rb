@@ -1,6 +1,7 @@
 require './process_header'
 
 class Writer
+  attr_reader :suffixes
 
 	def initialize
 	
@@ -9,40 +10,37 @@ class Writer
 			else @file = "anna_k.txt"
 		end
 		
-		@suffixes = {}		
+		@suffixes = Hash.new {|suffs,n| suffs[n] = generate_suffixes(n)}
 	end
 
 	def words
 		@words ||= File.read(@file).gsub(/\n\n/," *P* ").split
 	end
 
-
-	def suffixes(n)		# hash: prefix of length n => array of suffixes with repetition
-		if @suffixes[n]
-			return @suffixes[n]
-		end		
+  def generate_suffixes(n)
 		hash = Hash.new { |hash,key| hash[key] = [] }
 
-		for i in (0..(words.length - n))
-			hash[words[i...(i+n)]] << words[i+n]
-		end
-		@suffixes[n] = hash
-		hash
-	end
+    words.each_cons(n+1).each_with_object(hash) do |ws, hash|
+      hash[ws.first n] << ws.last
+    end
+  end
 	
 
 # assume prefix.length >= order
 	def chain(prefix, order) # array, number -> string that comes after array, based on order
-		successors = suffixes(order)[prefix[(0-order)..-1]]	# array of successors to prefix		
+		successors = suffixes[order][prefix[(0-order)..-1]]	# array of successors to prefix		
 		successors[rand(successors.length)]
 	end
 
 
 	def start(n) # first n words of a randomly chosen paragraph
 		$/ = "\n\n"
-		paragraph_array = File.readlines(@file)		
-		paragraph = paragraph_array[rand(paragraph_array.length)]
-		start = paragraph.split[0...n]
+    paragraph_array = File.readlines @file
+    loop do
+      paragraph = paragraph_array[rand(paragraph_array.length)]
+      start = paragraph.split.first n
+      return start unless start.length < n
+    end
 	end
 
 
