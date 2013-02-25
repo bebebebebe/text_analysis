@@ -1,6 +1,7 @@
 require './process_header'
 
 class Writer
+  attr_reader :suffixes
 
 	def initialize
 	
@@ -9,7 +10,7 @@ class Writer
 			else @file = "anna_k.txt"
 		end
 		
-		@suffixes = {}		
+		@suffixes = Hash.new {|suffs,n| suffs[n] = generate_suffixes(n)}
 	end
 
 	def words
@@ -17,58 +18,31 @@ class Writer
 	end
 
 
-	def suffixes(n)		# hash: prefix of length n => array of suffixes with repetition
-		if @suffixes[n]
-			return @suffixes[n]
-		end		
-		hash = Hash.new { |hash,key| hash[key] = [] }
-
-		for i in (0..(words.length - n))
-			hash[words[i...(i+n)]] << words[i+n]
-		end
-		@suffixes[n] = hash
-		hash
-	end
-	
-
 # assume prefix.length >= order
 	def chain(prefix, order) # array, number -> string that comes after array, based on order
-		successors = suffixes(order)[prefix[(0-order)..-1]]	# array of successors to prefix		
-		successors[rand(successors.length)]
+		successors = suffixes[order][prefix.last order]	# array of successors to prefix		
+    select_random successors
 	end
 
 
 	def start(n) # first n words of a randomly chosen paragraph
 		$/ = "\n\n"
-		paragraph_array = File.readlines(@file)		
-		paragraph = paragraph_array[rand(paragraph_array.length)]
-		start = paragraph.split[0...n]
+    paragraph_array = File.readlines @file # Don't read the file more than once.
+    start_arrays = paragraph_array.map {|p| p.split.take n}.select {|s| s.size == n}
+    select_random start_arrays
 	end
 
 
 	def paragraph(order)	# generate paragraph, with order-gram markov chain
-		array = []
-		start = start(order)		
-		while start.length < order		# check that start is long enough
-			start = start(order)
-		end
-		for i in (0...order)
-			array[i] = start[i]
-		end
-		array
-		while array.length < 500			# use chain to determine next word. stop when get to end of a paragraph marker, or
- 			prefix = array[(0-order)..-1]	# 	have more than 500 words.
+		array = start order
+		while array.length < 500		# use chain to determine next word. stop when get to end of a paragraph marker, or
+ 			prefix = array.last order # have more than 500 words.
  			next_word = chain(prefix, order)
- 			if next_word == "*P*"
- 				break
- 			else array << next_word
- 			end
+
+      break if next_word == "*P*"
+      array << next_word
  		end 
- 		paragraph = ""
- 		array.each do |x|
- 			paragraph += x + " "
- 		end
-		paragraph
+    array.join " "
 	end
 	
 	def output(order=2, number_of_paragraphs=2)
@@ -84,6 +58,20 @@ class Writer
 			puts "(based on #{source_info[1]} by #{source_info[0]})"
 		end
 	end
+
+  private
+  def select_random(a)
+    a[rand a.length]
+  end
+
+  def generate_suffixes(n)
+		hash = Hash.new { |hash,key| hash[key] = [] }
+
+    words.each_cons(n+1).each_with_object(hash) do |ws, hash|
+      hash[ws.first n] << ws.last
+    end
+  end
+	
 end
 
 
