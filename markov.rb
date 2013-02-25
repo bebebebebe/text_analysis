@@ -17,30 +17,19 @@ class Writer
 		@words ||= File.read(@file).gsub(/\n\n/," *P* ").split
 	end
 
-  def generate_suffixes(n)
-		hash = Hash.new { |hash,key| hash[key] = [] }
-
-    words.each_cons(n+1).each_with_object(hash) do |ws, hash|
-      hash[ws.first n] << ws.last
-    end
-  end
-	
 
 # assume prefix.length >= order
 	def chain(prefix, order) # array, number -> string that comes after array, based on order
-		successors = suffixes[order][prefix[(0-order)..-1]]	# array of successors to prefix		
-		successors[rand(successors.length)]
+		successors = suffixes[order][prefix.last order]	# array of successors to prefix		
+    select_random successors
 	end
 
 
 	def start(n) # first n words of a randomly chosen paragraph
 		$/ = "\n\n"
     paragraph_array = File.readlines @file # Don't read the file more than once.
-    loop do
-      paragraph = paragraph_array[rand(paragraph_array.length)]
-      start = paragraph.split.first n
-      return start if start.length == n # Always return an array of the correct length
-    end
+    start_arrays = paragraph_array.map {|p| p.split.take n}.select {|s| s.size == n}
+    select_random start_arrays
 	end
 
 
@@ -50,7 +39,7 @@ class Writer
  			prefix = array.last order # have more than 500 words.
  			next_word = chain(prefix, order)
 
- 			break if next_word == "*P*"
+      break if next_word == "*P*"
       array << next_word
  		end 
     array.join " "
@@ -69,6 +58,20 @@ class Writer
 			puts "(based on #{source_info[1]} by #{source_info[0]})"
 		end
 	end
+
+  private
+  def select_random(a)
+    a[rand a.length]
+  end
+
+  def generate_suffixes(n)
+		hash = Hash.new { |hash,key| hash[key] = [] }
+
+    words.each_cons(n+1).each_with_object(hash) do |ws, hash|
+      hash[ws.first n] << ws.last
+    end
+  end
+	
 end
 
 
