@@ -35,38 +35,25 @@ class Writer
 
 	def start(n) # first n words of a randomly chosen paragraph
 		$/ = "\n\n"
-    paragraph_array = File.readlines @file
+    paragraph_array = File.readlines @file # Don't read the file more than once.
     loop do
       paragraph = paragraph_array[rand(paragraph_array.length)]
       start = paragraph.split.first n
-      return start unless start.length < n
+      return start if start.length == n # Always return an array of the correct length
     end
 	end
 
 
 	def paragraph(order)	# generate paragraph, with order-gram markov chain
-		array = []
-		start = start(order)		
-		while start.length < order		# check that start is long enough
-			start = start(order)
-		end
-		for i in (0...order)
-			array[i] = start[i]
-		end
-		array
-		while array.length < 500			# use chain to determine next word. stop when get to end of a paragraph marker, or
- 			prefix = array[(0-order)..-1]	# 	have more than 500 words.
+		array = start order
+		while array.length < 500		# use chain to determine next word. stop when get to end of a paragraph marker, or
+ 			prefix = array.last order # have more than 500 words.
  			next_word = chain(prefix, order)
- 			if next_word == "*P*"
- 				break
- 			else array << next_word
- 			end
+
+ 			break if next_word == "*P*"
+      array << next_word
  		end 
- 		paragraph = ""
- 		array.each do |x|
- 			paragraph += x + " "
- 		end
-		paragraph
+    array.join " "
 	end
 	
 	def output(order=2, number_of_paragraphs=2)
