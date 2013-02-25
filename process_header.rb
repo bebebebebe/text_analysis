@@ -1,17 +1,10 @@
 # helper file for markov.rb
 
-# txt file from project Gutenberg -> file with header removed, title
-# header: info up to ***START OF THIS PROJECT GUTENBERG EBOOK [TITLE]***, 
-#	plus following paragraph (variable spacing surrounds it)
+# Given txt file, check if it's from Project Gutenberg.
+# If so, remove header and footer, and extract title and author information.
 
 
-
-
-# file from initialize, next line to be deleted
-#file = "anna_k.txt"
-
-
-def remove_header(file)	# removes header and footer if @file is a project gutenberg file
+def remove_header(file)	# removes header and footer if file is a project gutenberg file
 						# puts result in new_file.txt
 	
 	new_file = "new_file.txt"
@@ -21,8 +14,9 @@ def remove_header(file)	# removes header and footer if @file is a project gutenb
 	output = File.open(new_file, 'w')
 
 	line_number = 0
+	end_line = 0
 	
-	if input[0][0...27] == "The Project Gutenberg EBook"		
+	if input[0..50].join.include? 'Project Gutenberg'
 		title_line = 0
 		author_line = 0
 		
@@ -37,7 +31,7 @@ def remove_header(file)	# removes header and footer if @file is a project gutenb
 		@title = input[title_line][7..-1].chomp if input[title_line][0...6] == "Title:"
 		@author = input[author_line][8..-1].chomp if input[author_line][0...7] == "Author:"
 		
-		end_line = 0
+		
 		end_line += 1 until (input[end_line][0...34] == "End of the Project Gutenberg EBook" or end_line == (input.length - 1))
 										
 	end

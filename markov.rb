@@ -38,7 +38,7 @@ class Writer
 	end
 
 
-	def start(n)
+	def start(n) # first n words of a randomly chosen paragraph
 		$/ = "\n\n"
 		paragraph_array = File.readlines(@file)		
 		paragraph = paragraph_array[rand(paragraph_array.length)]
@@ -46,7 +46,7 @@ class Writer
 	end
 
 
-	def paragraph(order)
+	def paragraph(order)	# generate paragraph, with order-gram markov chain
 		array = []
 		start = start(order)		
 		while start.length < order		# check that start is long enough
@@ -56,8 +56,8 @@ class Writer
 			array[i] = start[i]
 		end
 		array
-		while array.length < 500
- 			prefix = array[(0-order)..-1]
+		while array.length < 500			# use chain to determine next word. stop when get to end of a paragraph marker, or
+ 			prefix = array[(0-order)..-1]	# 	have more than 500 words.
  			next_word = chain(prefix, order)
  			if next_word == "*P*"
  				break
@@ -71,16 +71,16 @@ class Writer
 		paragraph
 	end
 	
-	def output(order=2, n=2)
+	def output(order=2, number_of_paragraphs=2)
 		remove_header(@file)
-		n.times { puts; puts paragraph(order); puts }
+		number_of_paragraphs.times { puts; puts paragraph(order); puts }
 		give_source_info
 	end
 	
-	def give_source_info
+	def give_source_info	# defined in process_header.rb
 		if source_info
 			puts
-			30.times {print " "}
+			20.times {print " "}
 			puts "(based on #{source_info[1]} by #{source_info[0]})"
 		end
 	end
